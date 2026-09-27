@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#120f1a">
+  <meta name="description" content="Hexcairn: a sleek, offline hexa stack sort puzzle. Drop hex stacks, slide matching colors together and merge 10 to clear.">
+  <title>Hexcairn – Hexa Stack Sort</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-basalt">
+  <div id="app">
+    <!-- HOME -->
+    <section id="home" class="screen">
+      <div class="home-coins"><span class="coin-ico"></span><span class="coins-val">0</span></div>
+      <div class="logo">
+        <canvas id="logo-cv" width="220" height="170" aria-hidden="true"></canvas>
+        <h1>HEXCAIRN</h1>
+        <p class="tag">Hexa Stack Sort</p>
+      </div>
+      <button id="btn-play" class="btn primary big"><span id="play-label">PLAY</span><small id="play-sub">Level 1</small></button>
+      <div class="home-row">
+        <button id="btn-shop" class="btn plate">⬢ Themes</button>
+        <button id="btn-settings-home" class="btn plate">⚙ Settings</button>
+      </div>
+      <a class="home-link" href="privacy.html">Privacy policy</a>
+    </section>
+
+    <!-- GAME -->
+    <section id="game" class="screen hidden">
+      <header class="topbar">
+        <button id="btn-home" class="icon-btn" aria-label="Home">
+          <svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20h-5.5v-5h-5v5H4z" fill="currentColor"/></svg>
+        </button>
+        <div class="levelbox">
+          <div class="lvl">LEVEL <span id="lvl">1</span></div>
+          <div class="progress"><i id="prog-fill"></i><span id="prog-txt">0 / 30</span></div>
+        </div>
+        <div class="top-coins"><span class="coin-ico"></span><span class="coins-val">0</span></div>
+        <button id="btn-restart" class="icon-btn" aria-label="Restart level">
+          <svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7l1.9.6A5 5 0 1 0 12 7v3L7.5 6 12 2z" fill="currentColor"/></svg>
+        </button>
+      </header>
+      <div id="stage"><canvas id="cv"></canvas></div>
+      <div class="toolbar">
+        <button id="btn-hammer" class="tool rewarded">
+          <svg viewBox="0 0 24 24"><path d="M14.5 3.5 20.5 9.5 18 12l-2-2-9.3 9.3a1.8 1.8 0 0 1-2.5 0l-.5-.5a1.8 1.8 0 0 1 0-2.5L13 7l-2-2z" fill="currentColor"/></svg>
+          <span>Hammer</span><em class="ad-badge">▶ AD</em>
+        </button>
+        <div id="chain" class="chain">&nbsp;</div>
+        <button id="btn-shuffle" class="tool rewarded">
+          <svg viewBox="0 0 24 24"><path d="M16 3h5v5l-1.8-1.8-3.6 3.6-1.4-1.4 3.6-3.6zM3 5.4 4.4 4l15.8 15.8L21 19v5h-5l1.8-1.8zM8.4 14.2l1.4 1.4-4.4 4.4L4 18.6z" fill="currentColor" transform="translate(0 -2)"/></svg>
+          <span>Shuffle</span><em class="ad-badge">▶ AD</em>
+        </button>
+      </div>
+      <div id="banner-slot" aria-hidden="true"></div>
+    </section>
+
+    <!-- LEVEL COMPLETE -->
+    <div id="win" class="overlay hidden">
+      <div class="panel over-panel">
+        <div class="over-kicker">TARGET REACHED</div>
+        <h2>LEVEL <span id="win-lvl">1</span></h2>
+        <div class="over-stats">
+          <div><b id="win-score">0</b><span>score</span></div>
+          <div><b id="win-moves">0</b><span>drops</span></div>
+          <div><b id="win-coins">+0</b><span>coins</span></div>
+        </div>
+        <div class="panel-actions col">
+          <button id="btn-next" class="btn primary big"><span>NEXT LEVEL</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOSE -->
+    <div id="lose" class="overlay hidden">
+      <div class="panel over-panel">
+        <div class="over-kicker">NO EMPTY CELLS</div>
+        <h2>BOARD FULL</h2>
+        <div class="over-stats">
+          <div><b id="lose-score">0</b><span>score</span></div>
+          <div><b id="lose-target">0</b><span>target</span></div>
+        </div>
+        <div class="panel-actions col">
+          <button id="btn-revive" class="btn plate rewarded">Revive: clear the messiest stacks <em class="ad-badge">▶ Watch ad</em></button>
+          <button id="btn-retry" class="btn primary big"><span>TRY AGAIN</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIRM RESTART -->
+    <div id="confirm" class="overlay hidden">
+      <div class="panel">
+        <h3>Restart this level?</h3>
+        <p>The board goes back to the start of the level and your score resets.</p>
+        <div class="panel-actions">
+          <button id="confirm-no" class="btn plate">Keep playing</button>
+          <button id="confirm-yes" class="btn primary">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div id="shop" class="overlay hidden">
+      <div class="panel shop-panel">
+        <div class="panel-head"><h3>Themes</h3><div class="top-coins"><span class="coin-ico"></span><span class="coins-val">0</span></div><button class="icon-btn close" data-close="shop" aria-label="Close">✕</button></div>
+        <p class="note">Cosmetic only. Earn coins by completing levels.</p>
+        <div id="shop-grid" class="shop-grid"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="settings" class="overlay hidden">
+      <div class="panel">
+        <div class="panel-head"><h3>Settings</h3><button class="icon-btn close" data-close="settings" aria-label="Close">✕</button></div>
+        <label class="row"><span>Sound effects</span><input type="checkbox" id="set-sound"><i class="sw"></i></label>
+        <label class="row"><span>Haptics</span><input type="checkbox" id="set-haptics"><i class="sw"></i></label>
+        <label class="row"><span>Color symbols (color-blind aid)</span><input type="checkbox" id="set-marks"><i class="sw"></i></label>
+        <div class="panel-actions col">
+          <a class="btn plate" href="privacy.html">Privacy policy</a>
+          <button id="btn-privacy-options" class="btn plate hidden">Ad privacy options</button>
+          <button id="btn-reset" class="btn plate danger">Reset progress</button>
+        </div>
+        <p class="ver">Hexcairn v1.0.0 · © OfferPk</p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="js/ads-config.js"></script>
+  <script src="js/adgate.js"></script>
+  <script src="js/ads.js"></script>
+  <script src="js/logic.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

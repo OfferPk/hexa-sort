@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hexcairn</string>
+    <string name="title_activity_main">Hexcairn</string>
+    <string name="package_name">com.offerpk.hexasort</string>
+    <string name="custom_url_scheme">com.offerpk.hexasort</string>
+</resources>

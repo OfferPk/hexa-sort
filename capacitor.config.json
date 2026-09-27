@@ -1,0 +1,11 @@
+{
+  "appId": "com.offerpk.hexasort",
+  "appName": "Hexcairn",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#120f1a"
+  },
+  "plugins": {
+    "AdMob": {}
+  }
+}
