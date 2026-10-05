@@ -20,10 +20,13 @@
         <h1>HEXCAIRN</h1>
         <p class="tag">Hexa Stack Sort</p>
       </div>
+      <div class="menu-col">
       <button id="btn-play" class="btn primary big"><span id="play-label">PLAY</span><small id="play-sub">Level 1</small></button>
       <div class="home-row">
         <button id="btn-shop" class="btn plate">⬢ Themes</button>
         <button id="btn-settings-home" class="btn plate">⚙ Settings</button>
+      </div>
+      <button id="btn-howto" class="btn plate big howto-open" type="button"><span>How to play</span><small>Rules</small></button>
       </div>
       <a class="home-link" href="privacy.html">Privacy policy</a>
     </section>
@@ -123,11 +126,27 @@
           <button id="btn-privacy-options" class="btn plate hidden">Ad privacy options</button>
           <button id="btn-reset" class="btn plate danger">Reset progress</button>
         </div>
-        <p class="ver">Hexcairn v1.0.0 · © OfferPk</p>
+        <p class="ver">Hexcairn v1.0.1 · © OfferPk</p>
       </div>
     </div>
 
-    <div id="toast" class="toast hidden"></div>
+        <div id="howto" class="overlay hidden">
+      <div class="howto-card" role="dialog" aria-modal="true" aria-label="How to play">
+        <button class="howto-x" type="button" data-close="howto" aria-label="Close">✕</button>
+        <table class="rules">
+          <thead><tr><th>Rule</th><th>Kaise</th></tr></thead>
+          <tbody>
+            <tr><td>Goal</td><td>Target score tak pahuncho</td></tr>
+            <tr><td>Move</td><td>Stack kisi khali cell par chhodo. Same top rang slide hota hai</td></tr>
+            <tr><td>Win</td><td>Score target ke barabar ya us se zyada</td></tr>
+            <tr><td>Fail</td><td>Board par koi khali cell na bache</td></tr>
+            <tr><td>Booster</td><td>Hammer ek stack todta hai. Shuffle naye stacks, ek dafa. Revive messy stacks, ek dafa</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+<div id="toast" class="toast hidden"></div>
   </div>
 
   <script src="js/ads-config.js"></script>

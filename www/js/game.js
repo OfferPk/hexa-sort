@@ -728,6 +728,15 @@
   $('btn-shuffle').addEventListener('click', shuffle);
   $('btn-shop').addEventListener('click', function () { SFX.unlock(); SFX.click(); renderShop(); $('shop').classList.remove('hidden'); });
   $('btn-settings-home').addEventListener('click', function () { SFX.unlock(); SFX.click(); syncSettingsUI(); $('settings').classList.remove('hidden'); });
+  function syncMenuCard() {
+    var b = $('btn-play');
+    if (!b) return;
+    document.documentElement.style.setProperty('--menu-w', b.offsetWidth + 'px');
+    document.documentElement.style.setProperty('--menu-h', b.offsetHeight + 'px');
+  }
+  $('btn-howto').addEventListener('click', function () { SFX.unlock(); SFX.click(); syncMenuCard(); $('howto').classList.remove('hidden'); });
+  window.addEventListener('resize', syncMenuCard);
+  syncMenuCard();
   Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (b) {
     b.addEventListener('click', function () { SFX.click(); $(b.dataset.close).classList.add('hidden'); });
   });
