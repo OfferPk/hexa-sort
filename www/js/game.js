@@ -59,6 +59,8 @@
   function haptic(kind) {
     if (!save.settings.haptics || !native) return;
     var H = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics;
+    // v1.7: drop light taps closer than 45 ms apart (avoids buzzy rattles on fast play)
+    var nowH = Date.now(); if (kind !== 'success' && kind !== 'error' && kind !== 'heavy' && nowH - (haptic.last || 0) < 45) return; haptic.last = nowH;
     if (!H) return;
     try {
       if (kind === 'success') H.notification({ type: 'SUCCESS' });
@@ -834,9 +836,9 @@
   $('btn-daily').addEventListener('click', function () { SFX.unlock(); SFX.click(); daily.open(); });
   // Weekly challenge (v1.6): same 3 goals for everyone this week; cosmetic coins + a crest badge.
   var weekly = window.Weekly ? window.Weekly.create({
-    key: 'hexcairn.weekly.v1', pool: window.WEEKLY_GOALS || [], salt: 'hexcairn', ach: ach,
+    daily: daily, key: 'hexcairn.weekly.v1', pool: window.WEEKLY_GOALS || [], salt: 'hexcairn', ach: ach,
     addCoins: function (n) { save.coins += n; persist(); setCoins(); },
-    toast: toast, sfx: function (k) { if (k === 'coin') SFX.coin(); else SFX.click(); }
+    toast: toast, sfx: function (k) { if (k === 'crest' && SFX.crest) { SFX.crest(); haptic('success'); } else if (k === 'goal' && SFX.goal) { SFX.goal(); haptic('medium'); } else if (k === 'coin') SFX.coin(); else SFX.click(); }
   }) : null;
   window.__weekly = weekly;
 
