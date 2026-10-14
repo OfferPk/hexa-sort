@@ -8,6 +8,9 @@ const URL = (process.argv[2] || 'http://localhost:8779/').replace(/\/?$/, '/');
 const OUT = process.argv[3] || '/tmp';
 const KEY = 'hexcairn.save.v1';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const achInfo = (k) => globalThis.__page.evaluate((k) => { const s = JSON.parse(localStorage.getItem(k) || '{}'); const defs = window.AchLogic.COMMON.concat(window.ACH_DEFS);
+  return { paid: defs.filter(d => s.done && s.done[d.id]).reduce((a, d) => a + d.reward, 0), m: s.m || {}, done: Object.keys(s.done || {}) }; }, k);
 const assert = (c, m) => { if (!c) throw new Error('ASSERT: ' + m); console.log('  ok -', m); };
 const lay2 = L.makeLayout(2);
 const cellOf = (q, r) => lay2.cells.findIndex(c => c.q === q && c.r === r);
@@ -15,7 +18,7 @@ const C = cellOf(0, 0), E = cellOf(1, 0);
 
 (async () => {
   const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', headless: 'new', args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const page = await browser.newPage(); globalThis.__page = page; await page.evaluateOnNewDocument(() => { try { localStorage.setItem('hexcairn.coach.v1', '1'); } catch (e) {} });
   await page.emulate({ viewport: { width: 360, height: 640, deviceScaleFactor: 3, isMobile: true, hasTouch: true },
     userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129 Mobile Safari/537.36' });
   const errors = [];
@@ -138,7 +141,10 @@ const C = cellOf(0, 0), E = cellOf(1, 0);
     await dragTouch(0, C); await sleep(700);
     assert(await visible('#win'), 'reaching the target shows Level complete');
     const coins = await page.evaluate(() => window.__hx.save.coins);
-    assert(coins === 10, 'cosmetic coins awarded (+10)');
+    const a1 = await achInfo('hexcairn.ach.v1');
+    assert(a1.m.wins === 1 && a1.m.games === 1 && a1.m.level >= 1 && a1.done.includes('hx_first'), 'achievement counters: wins/games/level went up, First Cairn unlocked');
+    assert(a1.m.stacks >= 1, 'achievement counter: cleared stacks went up (' + a1.m.stacks + ')');
+    assert(coins === 10 + a1.paid, 'cosmetic coins awarded (+10 level, +' + a1.paid + ' achievements)');
     await page.screenshot({ path: `${OUT}/hx-win.png` });
     await page.tap('#btn-next'); await sleep(900);
     const a = await game();

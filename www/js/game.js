@@ -536,7 +536,7 @@
       save.level = Math.max(save.level, G.level + 1);
       persist();
     }
-    SFX.win(); haptic('success');
+    SFX.win(); haptic('success'); if (window.Juice) window.Juice.burst();
     $('win-lvl').textContent = G.level;
     $('win-score').textContent = G.score;
     $('win-moves').textContent = G.placements;
@@ -644,6 +644,7 @@
     window.Ads.hideBanner();
   }
   function showGame() {
+    maybeTutorial(false);
     $('home').classList.add('hidden'); $('game').classList.remove('hidden');
     enterLevel();
     if (G.won) onWin(); else if (G.lost) onLose();
@@ -761,6 +762,37 @@
     if (++ticks % 10 === 0) persist();
   }, 1000);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') persist(); });
+
+  // ---------------- first-level tutorial (coach marks, shown once) ----------------
+  var COACH_KEY = 'hexcairn.coach.v1';
+  var COACH_STEPS = [
+      {
+          "target": "#cv",
+          "text": "Drag a stack from the tray below onto an empty hex on the board."
+      },
+      {
+          "target": "#cv",
+          "text": "Matching colours on touching hexes slide together. 10 of one colour clear for points."
+      },
+      {
+          "target": ".progress",
+          "text": "Reach the target score to win the level. Fill every hex and it's over."
+      },
+      {
+          "target": "#btn-hammer",
+          "text": "Hammer and Shuffle help when stuck. They play a short ad only when you tap them."
+      }
+  ];
+  function maybeTutorial(force) {
+    setTimeout(function () {
+      if ($('game').classList.contains('hidden')) return;
+      window.Coach.run(COACH_KEY, COACH_STEPS, { force: force, sfx: function () { SFX.click(); } });
+    }, 450);
+  }
+  $('btn-replay-tutorial').addEventListener('click', function () {
+    SFX.click(); window.CoachLogic.reset(localStorage, COACH_KEY); $('settings').classList.add('hidden');
+    toast('The tutorial will play when you next open the game screen');
+  });
 
   // ---------------- achievements + stats ----------------
   var ACH_DEFS = window.ACH_DEFS;
