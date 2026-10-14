@@ -71,7 +71,7 @@
     var t = $('toast'); t.textContent = msg; t.classList.remove('hidden');
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.add('hidden'); }, ms || 2200);
   }
-  function setCoins() { Array.prototype.forEach.call(document.querySelectorAll('.coins-val'), function (e) { e.textContent = save.coins; }); }
+  function setCoins() { Array.prototype.forEach.call(document.querySelectorAll('.coins-val'), function (e) { e.textContent = save.coins; }); if (typeof ach !== 'undefined' && ach) ach.sync(); }
   function applyTheme() {
     var cl = document.body.classList;
     Array.prototype.slice.call(cl).forEach(function (c) { if (/^theme-/.test(c)) cl.remove(c); });
@@ -475,7 +475,7 @@
     for (var e = 0; e < events.length; e++) {
       var ev = events[e];
       if (ev.t === 'move') await animMove(ev);
-      else if (ev.t === 'clear') { await animClear(ev); chainShown = ev.chain; }
+      else if (ev.t === 'clear') { await animClear(ev); chainShown = ev.chain; if (ach) ach.bump('stacks'); }
     }
     if (chainShown > 1) { $('chain').textContent = 'CHAIN ×' + chainShown; setTimeout(function () { $('chain').innerHTML = '&nbsp;'; }, 1600); }
   }
@@ -523,6 +523,10 @@
 
   // ---------------- win / lose ----------------
   function onWin() {
+    if (ach && !G.achWon) {
+      G.achWon = 1; if (!G.achLost) ach.bump('games'); ach.bump('wins'); ach.max('level', G.level); ach.max('best_score', G.score); ach.min('fewest', G.placements || 0);
+      if (!G.shuffleUsed && !G.reviveUsed && !G.hammerUsed) ach.bump('clean_wins');
+    }
     if (G.daily) {
       if (!G.awarded) { G.awarded = -1; gate.levelCompleted(G.level); daily.complete(G.daily); persist(); }
     } else if (!G.awarded) {
@@ -542,6 +546,7 @@
     if (native && gate.state.maxCompleted >= gate.config.INTERSTITIAL_MIN_LEVEL - 1) window.Ads.prepareInterstitial();
   }
   function onLose() {
+    if (ach && !G.achLost) { G.achLost = 1; ach.bump('games'); }
     SFX.lose(); haptic('error');
     $('lose-score').textContent = G.score;
     $('lose-target').textContent = G.target;
@@ -594,7 +599,7 @@
         col = theme().tiles[st[i] % theme().tiles.length];
         for (var q = 0; q < 2; q++) particles.push({ x: pos.x + (Math.random() - 0.5) * S, y: pos.y - i * T, vx: (Math.random() - 0.5) * 320, vy: -80 - Math.random() * 260, s: S * (0.12 + Math.random() * 0.14), col: col, t0: performance.now(), life: 700 + Math.random() * 300, r: Math.random() * 6 });
       }
-      L.hammer(G, cell);
+      L.hammer(G, cell); G.hammerUsed = true;
       smashFx = { cell: cell, t0: performance.now() };
       hammerMode = false;
       SFX.smash(); haptic('heavy');
@@ -757,10 +762,23 @@
   }, 1000);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') persist(); });
 
+  // ---------------- achievements + stats ----------------
+  var ACH_DEFS = window.ACH_DEFS;
+  var ach = window.Achievements.create({
+    key: 'hexcairn.ach.v1', defs: ACH_DEFS,
+    addCoins: function (n) { save.coins += n; persist(); setCoins(); },
+    coins: function () { return save.coins; },
+    bought: function () { return Math.max(0, save.owned.length - 1) + Math.max(0, (save.ownedBg || []).length - 1); },
+    toast: toast, sfx: function (k) { if (k === 'coin') SFX.coin(); else SFX.click(); },
+    stats: function (st) { var g = function (k) { return st.m[k] || 0; }; return [['Levels won', String(g('wins'))], ['Highest level', String(Math.max(g('level'), (save.level || 1) - 1))], ['Best level score', g('best_score').toLocaleString('en-US')], ['Fewest placements to win', g('fewest') ? String(g('fewest')) : '—']]; }
+  });
+  $('btn-ach-card').addEventListener('click', function () { SFX.unlock(); SFX.click(); ach.open(); });
+
   // ---------------- daily ----------------
   function dailyLevelFor(key) { return 12 + (window.DailyLogic.seedFor(key, 'hexcairn') % 40); }
   var daily = window.Daily.create({
     key: 'hexcairn.daily.v1',
+    onEvent: function (t, d) { if (!ach) return; if (t === 'claim') { ach.bump('daily_claims'); ach.max('daily_best_day', d.day); } else { ach.bump('challenges'); ach.max('best_chal_streak', d.streak); } },
     addCoins: function (n) { save.coins += n; persist(); setCoins(); },
     rewarded: function (ok, fail) { window.Ads.showRewarded(ok, fail); },
     toast: toast, sfx: function (k) { if (k === 'coin') SFX.coin(); else SFX.click(); },
