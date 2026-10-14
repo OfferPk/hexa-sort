@@ -164,7 +164,7 @@
       hexPath(c, x, y, s * 0.99); c.strokeStyle = 'rgba(255,255,255,' + (0.25 + 0.3 * th.gloss) + ')'; c.lineWidth = Math.max(1, s * 0.05); c.stroke();
       hexPath(c, x, y - s * 0.02, s * 0.56);
       c.fillStyle = 'rgba(255,255,255,' + (0.08 + 0.12 * th.gloss) + ')'; c.fill();
-      if (opts.mark && save.settings.marks) drawMark(c, x, y, s, opts.ci);
+      if (opts.mark && (window.A11y ? window.A11y.marksOn(save.settings) : save.settings.marks)) drawMark(c, x, y, s, opts.ci);
     }
   }
   function drawMark(c, x, y, s, ci) {
@@ -263,6 +263,7 @@
   }
   function render(now) {
     if (!G || $('game').classList.contains('hidden')) return;
+    srSync();
     var c = ctx;
     c.setTransform(DPR, 0, 0, DPR, 0, 0);
     c.clearRect(0, 0, W, H);
@@ -440,6 +441,55 @@
         if (k < 1) requestAnimationFrame(step); else res();
       })(t0);
     });
+  }
+  // ---------------- screen-reader board (v1.9) ----------------
+  // Invisible, pointer-transparent buttons over the canvas so TalkBack/keyboard users can
+  // pick a tray stack, then an empty cell. Rebuilt only when the board or layout changes.
+  var srBox = null, srSig = '', srSlot = -1;
+  function srColors(stack) {
+    var out = [], i = stack.length - 1;
+    while (i >= 0) { var col = stack[i], n = 0; while (i >= 0 && stack[i] === col) { n++; i--; } out.push(n + ' ' + window.SR.COLORS[col % window.SR.COLORS.length]); }
+    return out.join(', then ');
+  }
+  function srSync() {
+    if (!window.SR || !G) return;
+    if (!srBox) {
+      srBox = document.createElement('div'); srBox.className = 'sr-grid'; srBox.id = 'hx-sr';
+      srBox.setAttribute('role', 'group'); srBox.setAttribute('aria-label', 'Hex board and tray');
+      $('stage').appendChild(srBox); cv.setAttribute('aria-hidden', 'true');
+    }
+    var sig = [W, H, srSlot, busy ? 1 : 0, JSON.stringify(G.stacks), JSON.stringify(G.tray), G.blocked.join('')].join('|');
+    if (sig === srSig) return; srSig = sig;
+    var focusedId = document.activeElement && document.activeElement.parentNode === srBox ? document.activeElement.dataset.k : null;
+    srBox.innerHTML = '';
+    function btn(k, x, y, label, fn) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.k = k;
+      b.style.left = x + 'px'; b.style.top = y + 'px'; b.setAttribute('aria-label', label); b.textContent = label;
+      b.addEventListener('click', function (e) { e.preventDefault(); fn(); });
+      srBox.appendChild(b); if (k === focusedId) setTimeout(function () { b.focus(); }, 0);
+    }
+    for (var s = 0; s < 3; s++) (function (s) {
+      var st = G.tray[s], p = slotXY(s);
+      btn('t' + s, p.x, p.y - 10, 'Tray stack ' + (s + 1) + ': ' + (st ? st.length + ' tiles, top ' + srColors(st) : 'used') + (srSlot === s ? ', selected' : ''), function () {
+        if (!st || busy || G.won || G.lost) return;
+        srSlot = s; SFX.pick(); window.SR.say('Stack ' + (s + 1) + ' selected. Now choose an empty cell.'); srSync();
+      });
+    })(s);
+    var lay = L.makeLayout(G.R);
+    for (var i = 0; i < lay.size; i++) (function (i) {
+      if (G.blocked[i]) return;
+      var p = cellXY(i), st = G.stacks[i];
+      btn('c' + i, p.x, p.y, 'Cell ' + (i + 1) + ': ' + (st.length ? st.length + ' tiles, top ' + srColors(st) : 'empty'), function () {
+        if (busy || G.won || G.lost) return;
+        if (srSlot < 0 || !G.tray[srSlot]) { window.SR.say(st.length ? 'Occupied. Pick a tray stack first.' : 'Pick a tray stack first.'); return; }
+        if (st.length) { SFX.error(); window.SR.say('That cell is occupied.'); return; }
+        var s = srSlot; srSlot = -1;
+        Promise.resolve(commit(s, i, null)).then(function () {
+          var pr = document.querySelector('#game .progress span');
+          window.SR.say('Placed on cell ' + (i + 1) + '.' + (pr ? ' Progress ' + pr.textContent + '.' : '')); srSync();
+        });
+      });
+    })(i);
   }
   async function commit(slot, cell, from) {
     busy = true;
@@ -847,6 +897,7 @@
   window.__weekly = weekly;
 
   // ---------------- boot ----------------
+  if (window.A11y && window.A11y.previewBar) window.A11y.previewBar({ settings: save.settings, marks: true, rerender: function () { drawLogo(); requestRender(); if (typeof renderShop === 'function') renderShop(); }, sfx: function () { SFX.click(); } });
   if (window.A11y) window.A11y.apply(save.settings);
   SFX.setEnabled(save.settings.sound);
   if (validGame(save.game)) G = save.game;
