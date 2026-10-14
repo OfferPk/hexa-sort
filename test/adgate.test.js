@@ -61,6 +61,6 @@ t('game.js asks for an interstitial in exactly one place: the Next-level transit
 });
 t('rewarded ads are only started from button handlers (hammer, shuffle, revive)', () => {
   const src = require('fs').readFileSync(__dirname + '/../www/js/game.js', 'utf8');
-  const n = (src.match(/Ads\.showRewarded\(/g) || []).length; assert.strictEqual(n, 3);
+  const n = (src.match(/Ads\.showRewarded\(/g) || []).length; assert.strictEqual(n, 4); // hammer, shuffle, revive + Daily "2x reward" (tap-only button in daily.js)
 });
 console.log(`ADGATE TESTS PASSED (${n})`);

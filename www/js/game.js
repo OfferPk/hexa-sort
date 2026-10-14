@@ -46,10 +46,11 @@
     return g && Array.isArray(g.stacks) && Array.isArray(g.blocked) && Array.isArray(g.tray) && g.tray.length === 3 &&
       (g.R === 2 || g.R === 3) && g.stacks.length === L.makeLayout(g.R).size && typeof g.target === 'number';
   }
-  function startLevel(n) {
+  function startLevel(n, dailyKey) {
     var lv = L.generateLevel(n);
     var g = L.newState(lv);
     g.awarded = 0;
+    if (dailyKey) g.daily = dailyKey;
     return g;
   }
 
@@ -520,7 +521,9 @@
 
   // ---------------- win / lose ----------------
   function onWin() {
-    if (!G.awarded) {
+    if (G.daily) {
+      if (!G.awarded) { G.awarded = -1; gate.levelCompleted(G.level); daily.complete(G.daily); persist(); }
+    } else if (!G.awarded) {
       G.awarded = L.coinsForLevel(G.level);
       save.coins += G.awarded;
       gate.levelCompleted(G.level);
@@ -531,7 +534,7 @@
     $('win-lvl').textContent = G.level;
     $('win-score').textContent = G.score;
     $('win-moves').textContent = G.placements;
-    $('win-coins').textContent = '+' + G.awarded;
+    $('win-coins').textContent = G.daily ? 'Daily ✓' : '+' + G.awarded;
     setCoins();
     $('win').classList.remove('hidden');
     if (native && gate.state.maxCompleted >= gate.config.INTERSTITIAL_MIN_LEVEL - 1) window.Ads.prepareInterstitial();
@@ -551,7 +554,7 @@
     $('win').classList.add('hidden');
     // the ONLY place an interstitial may appear: between levels
     try { await window.Ads.maybeInterstitial(gate); } catch (e) {}
-    G = save.game = startLevel(G.level + 1);
+    G = save.game = G.daily ? startLevel(Math.max(1, save.level | 0)) : startLevel(G.level + 1);
     persist();
     enterLevel();
     transitioning = false;
@@ -559,7 +562,7 @@
   function restartLevel() {
     SFX.click();
     $('lose').classList.add('hidden'); $('confirm').classList.add('hidden');
-    G = save.game = startLevel(G.level);
+    G = save.game = startLevel(G.level, G.daily);
     persist();
     enterLevel();
   }
@@ -760,6 +763,18 @@
     if (++ticks % 10 === 0) persist();
   }, 1000);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') persist(); });
+
+  // ---------------- daily ----------------
+  function dailyLevelFor(key) { return 12 + (window.DailyLogic.seedFor(key, 'hexcairn') % 40); }
+  var daily = window.Daily.create({
+    key: 'hexcairn.daily.v1',
+    addCoins: function (n) { save.coins += n; persist(); setCoins(); },
+    rewarded: function (ok, fail) { window.Ads.showRewarded(ok, fail); },
+    toast: toast, sfx: function (k) { if (k === 'coin') SFX.coin(); else SFX.click(); },
+    challenge: function (key) { return { title: 'Daily Cairn', desc: 'Same level for everyone today (Level ' + dailyLevelFor(key) + ')', cta: 'Play Daily Cairn' }; },
+    play: function (key) { G = save.game = startLevel(dailyLevelFor(key), key); persist(); showGame(); toast('Daily Cairn: Level ' + G.level); }
+  });
+  $('btn-daily').addEventListener('click', function () { SFX.unlock(); SFX.click(); daily.open(); });
 
   // ---------------- boot ----------------
   SFX.setEnabled(save.settings.sound);
