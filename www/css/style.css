@@ -231,3 +231,6 @@ body.bg-starlit, .bg-swatch.bg-starlit { background: radial-gradient(1.5px 1.5px
 body.bg-waves, .bg-swatch.bg-waves { background: repeating-radial-gradient(circle at 50% 120%, rgba(120,220,255,.10) 0 14px, transparent 14px 34px), linear-gradient(180deg, rgba(20,80,120,.25), rgba(0,0,0,0) 60%), var(--bg, #0e1a26); }
 body.bg-prism, .bg-swatch.bg-prism { background: conic-gradient(from 210deg at 50% 30%, rgba(255,80,160,.18), rgba(255,200,80,.14), rgba(80,255,200,.16), rgba(80,140,255,.18), rgba(255,80,160,.18)), var(--bg, #141022); }
 .bg-swatch.bg-none { background: var(--bg, #222); }
+/* v1.2.1: readable item names on every card (light themes included) + header badge layout */
+.shop-grid .item .nm { color: #fff; background: rgba(12,10,18,.62); padding: 3px 10px; border-radius: 999px; text-shadow: 0 1px 1px rgba(0,0,0,.5); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel-head .top-coins { position: static; transform: none; flex: none; }
