@@ -277,3 +277,39 @@ body.bg-prism, .bg-swatch.bg-prism { background: conic-gradient(from 210deg at 5
 .coach-tip.compact { padding: 7px 10px; font-size: 13px; line-height: 1.25; }
 .coach-tip.compact p { margin: 0 0 5px; }
 .coach-tip.compact .coach-row button { padding: 4px 10px; font-size: 13px; }
+
+/* v1.6 themes */
+.theme-orchard {
+  --bg: radial-gradient(120% 80% at 50% 0%, #26381f 0%, #121c0f 55%, #070b06 100%);
+  --txt: #f0f4e6; --muted: #a6b591; --accent: #f0b04f; --accent-2: #c9842a; --accent-ink: #261502;
+  --panel: linear-gradient(180deg, #24331f, #121a0f); --plate: linear-gradient(180deg, #33452c, #1e2a1a); --plate-edge: #070b05;
+}
+.theme-cobalt {
+  --bg: radial-gradient(120% 80% at 50% 0%, #1c3270 0%, #0d1838 55%, #050a19 100%);
+  --txt: #eef2ff; --muted: #9aa8d0; --accent: #f2e6c4; --accent-2: #cdbb8a; --accent-ink: #141c38;
+  --panel: linear-gradient(180deg, #1a2a5a, #0c1530); --plate: linear-gradient(180deg, #23397a, #142350); --plate-edge: #050a19;
+}
+.theme-rosewood {
+  --bg: radial-gradient(120% 80% at 50% 0%, #4a1f2a 0%, #240d13 55%, #100508 100%);
+  --txt: #fbecef; --muted: #c7969f; --accent: #f0c094; --accent-2: #c98d5c; --accent-ink: #2a1206;
+  --panel: linear-gradient(180deg, #44202a, #210d13); --plate: linear-gradient(180deg, #552a35, #351820); --plate-edge: #100508;
+}
+.theme-nightfall {
+  --bg: radial-gradient(100% 60% at 50% 110%, rgba(90,240,190,.18) 0%, transparent 60%), radial-gradient(120% 80% at 50% 0%, #0f3434 0%, #071a1a 55%, #020909 100%);
+  --txt: #e6fff6; --muted: #8cc4b4; --accent: #7af5c8; --accent-2: #3fcf9a; --accent-ink: #032015;
+  --panel: linear-gradient(180deg, #0f3030, #071818); --plate: linear-gradient(180deg, #164040, #0b2626); --plate-edge: #020909;
+}
+/* Weekly challenge (v1.6) */
+.weekly { margin-top: 4px; }
+.weekly-left { text-transform: none; letter-spacing: 0; font-weight: 600; opacity: .75; }
+.weekly-goals { display: flex; flex-direction: column; gap: 6px; }
+.weekly-goal { padding: 7px 10px; border-radius: 10px; background: rgba(127,127,127,.12); }
+.weekly-row { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.weekly-n { white-space: nowrap; }
+.weekly-bar { height: 5px; border-radius: 3px; background: rgba(127,127,127,.25); margin-top: 5px; overflow: hidden; }
+.weekly-bar i { display: block; height: 100%; background: #f2b84b; border-radius: 3px; }
+.weekly-goal.done .weekly-bar i { background: #3fcf8e; }
+.weekly-goal.done { opacity: .75; }
+.weekly-foot { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 8px; opacity: .85; }
+.weekly-crest { font-size: 18px; }
+.daily-panel { max-height: calc(100% - 24px); overflow-y: auto; }

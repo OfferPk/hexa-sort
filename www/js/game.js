@@ -832,6 +832,13 @@
     play: function (key) { G = save.game = startLevel(dailyLevelFor(key), key); persist(); showGame(); toast('Daily Cairn: Level ' + G.level); }
   });
   $('btn-daily').addEventListener('click', function () { SFX.unlock(); SFX.click(); daily.open(); });
+  // Weekly challenge (v1.6): same 3 goals for everyone this week; cosmetic coins + a crest badge.
+  var weekly = window.Weekly ? window.Weekly.create({
+    key: 'hexcairn.weekly.v1', pool: window.WEEKLY_GOALS || [], salt: 'hexcairn', ach: ach,
+    addCoins: function (n) { save.coins += n; persist(); setCoins(); },
+    toast: toast, sfx: function (k) { if (k === 'coin') SFX.coin(); else SFX.click(); }
+  }) : null;
+  window.__weekly = weekly;
 
   // ---------------- boot ----------------
   SFX.setEnabled(save.settings.sound);

@@ -23,7 +23,19 @@ window.THEMES = [
     tiles: ['#ff2e88', '#ff8c42', '#fff275', '#3cff9e', '#29e0ff', '#5a7dff', '#c04dff', '#ff66c4'] },
   { id: 'aurora', name: 'Aurora', price: 900,
     plate: ['#141a33', '#070a17'], rim: '#6ee7ff', slot: '#0f1429', slotEdge: '#27305a', stone: ['#343a55', '#1b1f33'], gloss: 0.8,
-    tiles: ['#ff3d77', '#ff9b3d', '#ffe14d', '#3dffa0', '#3de8ff', '#4d7dff', '#b44dff', '#ff66e0'] }
+    tiles: ['#ff3d77', '#ff9b3d', '#ffe14d', '#3dffa0', '#3de8ff', '#4d7dff', '#b44dff', '#ff66e0'] },
+  { id: 'orchard', name: 'Night Orchard', price: 450,
+    plate: ['#1f2f1c', '#0e170c'], rim: '#e0a24a', slot: '#172414', slotEdge: '#2f4529', stone: ['#3f4a3a', '#232a20'], gloss: 0.55,
+    tiles: ['#e5484d', '#f08c3a', '#f2cf4a', '#7ccf4a', '#3fbf9a', '#4f8fe0', '#a46fe0', '#ef7aa8'] },
+  { id: 'cobalt', name: 'Cobalt Kiln', price: 650,
+    plate: ['#14234a', '#0a1228'], rim: '#e8e0c8', slot: '#0f1b3a', slotEdge: '#26386a', stone: ['#38425e', '#1e2438'], gloss: 0.75,
+    tiles: ['#e8505b', '#f2a24a', '#f5dc6a', '#4fd08a', '#4fd0d8', '#5a8cff', '#a97aff', '#ff86c0'] },
+  { id: 'rosewood', name: 'Rosewood', price: 550,
+    plate: ['#3a1820', '#1c0a0f'], rim: '#e6b58a', slot: '#2b1117', slotEdge: '#4a2430', stone: ['#4e3a3e', '#2c2023'], gloss: 0.5,
+    tiles: ['#ff5a6a', '#ff9a52', '#f7d36a', '#8ad37a', '#46c2b0', '#5a9cf0', '#b07ae8', '#ff8ac0'] },
+  { id: 'nightfall', name: 'Nightfall Mint', price: 800,
+    plate: ['#0e2a2a', '#051414'], rim: '#9df5d0', slot: '#0a2121', slotEdge: '#1f4444', stone: ['#2f4848', '#182828'], gloss: 0.8,
+    tiles: ['#ff5c7a', '#ffad5c', '#fff07a', '#5cffb0', '#5ce8ff', '#6a8aff', '#c27aff', '#ff7ad8'] }
 ];
 
 if (typeof module !== 'undefined') module.exports = window.THEMES;
