@@ -274,3 +274,6 @@ body.bg-prism, .bg-swatch.bg-prism { background: conic-gradient(from 210deg at 5
 @keyframes coachIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .coach-ring, .coach-tip.pop { animation: none; transition: none; } }
 .juice-bit { position: fixed; width: 8px; height: 12px; z-index: 95; pointer-events: none; border-radius: 2px; }
+.coach-tip.compact { padding: 7px 10px; font-size: 13px; line-height: 1.25; }
+.coach-tip.compact p { margin: 0 0 5px; }
+.coach-tip.compact .coach-row button { padding: 4px 10px; font-size: 13px; }

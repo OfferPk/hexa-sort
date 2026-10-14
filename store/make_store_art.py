@@ -21,6 +21,8 @@ CAPTIONS = [
     ('04', '4-glacier', '500+ WINNABLE LEVELS', 'Every level is checked by a simulator'),
     ('05', '7-shop', 'SLEEK THEMES', 'Glacier, Ember, Aurora & more. Cosmetic only'),
     ('06', '5-aurora', 'PLAY OFFLINE, NO TIMER', 'Think, drop, relax. Progress saves itself'),
+    ('07', 'v15-daily', 'DAILY CAIRN', 'A fresh daily level and a 7-day reward streak'),
+    ('08', 'v15-ach', 'ACHIEVEMENTS & STATS', '18 goals to chase. Track your progress'),
 ]
 
 

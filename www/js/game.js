@@ -543,6 +543,7 @@
     $('win-coins').textContent = G.daily ? 'Daily ✓' : '+' + G.awarded;
     setCoins();
     $('win').classList.remove('hidden');
+    if (window.Review && ach) window.Review.maybe('hexcairn.review.v1', ach.get('wins'));
     if (native && gate.state.maxCompleted >= gate.config.INTERSTITIAL_MIN_LEVEL - 1) window.Ads.prepareInterstitial();
   }
   function onLose() {
@@ -763,15 +764,28 @@
   }, 1000);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') persist(); });
 
+  // ---------------- cloud save (Play Games) - OFF unless CLOUD_CONFIG.ENABLED ----------------
+  if (window.CloudSave && window.CloudSave.enabled()) {
+    var CK = window.CLOUD_CONFIG.KEYS;
+    $('btn-cloud').classList.remove('hidden');
+    $('btn-cloud').addEventListener('click', function () {
+      SFX.click(); persist();
+      window.CloudSave.save(CK).then(function (r) { toast(r.ok ? 'Progress backed up to Play Games' : 'Cloud save unavailable'); }, function () { toast('Cloud save failed. Try again later.'); });
+    });
+    window.CloudSave.restore(CK).then(function (r) { if (r && r.applied) location.reload(); }, function () {});
+  }
+
   // ---------------- first-level tutorial (coach marks, shown once) ----------------
   var COACH_KEY = 'hexcairn.coach.v1';
   var COACH_STEPS = [
       {
           "target": "#cv",
+          "place": "top",
           "text": "Drag a stack from the tray below onto an empty hex on the board."
       },
       {
           "target": "#cv",
+          "place": "top",
           "text": "Matching colours on touching hexes slide together. 10 of one colour clear for points."
       },
       {
