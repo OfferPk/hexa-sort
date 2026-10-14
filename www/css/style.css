@@ -37,6 +37,24 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   --panel: linear-gradient(180deg, #1a2046, #0c1026); --plate: linear-gradient(180deg, #26305e, #171d3d); --plate-edge: #05060f;
 }
 
+.theme-lagoon {
+  --bg: radial-gradient(120% 80% at 50% 0%, #11566a 0%, #08303c 55%, #03161c 100%);
+  --txt: #e8fbf8; --muted: #8cc4bd; --accent: #7fe3d4; --accent-2: #3bb3a3; --accent-ink: #032420;
+  --panel: linear-gradient(180deg, #114a5a, #0a2c36); --plate: linear-gradient(180deg, #17606f, #0f4553); --plate-edge: #031418;
+}
+.theme-sandstone {
+  --bg: radial-gradient(120% 80% at 50% 0%, #f6e7cc 0%, #e6cfa6 60%, #cdb083 100%);
+  --txt: #3b2a16; --muted: #7d6446; --accent: #b5722f; --accent-2: #8a5220; --accent-ink: #fff8ee;
+  --panel: linear-gradient(180deg, #fbf2e2, #ecdcbd); --plate: linear-gradient(180deg, #fffaf0, #ead6b2); --plate-edge: #b8945f;
+}
+.theme-sandstone .btn.danger { color: #a5302a; }
+.theme-sandstone .top-coins, .theme-sandstone .home-coins { background: rgba(255,255,255,.6); border-color: rgba(0,0,0,.08); }
+.theme-synth {
+  --bg: linear-gradient(rgba(255,79,216,.08) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, rgba(41,224,255,.08) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(180deg, #24093f, #0a0218);
+  --txt: #fbeaff; --muted: #b48fd6; --accent: #ff4fd8; --accent-2: #c42bb0; --accent-ink: #1c0219;
+  --panel: linear-gradient(180deg, #2a0f45, #13061f); --plate: linear-gradient(180deg, #3b1663, #220b3b); --plate-edge: #07010e;
+}
+
 /* ---------------- screens ---------------- */
 #app { position: fixed; inset: 0; }
 .screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding-top: var(--sat); padding-bottom: var(--sab); }
@@ -201,3 +219,15 @@ body.web .ad-badge { display: none; }
 .daily-open { position: relative; }
 #daily-dot { position: absolute; top: 8px; right: 12px; width: 10px; height: 10px; border-radius: 50%; background: #ff4d6d; box-shadow: 0 0 8px #ff4d6d; }
 .hidden#daily-dot { display: none; }
+/* Skin Shop v1.2: sections, preview, 24h try, background overlays */
+.shop-sec { grid-column: 1 / -1; margin: 8px 0 2px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.item.previewing { outline: 2px dashed #7efbff; outline-offset: 2px; }
+.item .prev { cursor: zoom-in; }
+.item .try { display: block; width: 100%; margin-top: 4px; font-size: 11px; padding: 4px 2px; border-radius: 8px; background: rgba(126,251,255,.12); border: 1px solid rgba(126,251,255,.45); }
+.item .trial-tag { display: block; font-size: 10px; font-weight: 700; color: var(--accent, #7efbff); margin-top: 2px; }
+.bg-swatch { width: 100%; height: 100%; min-height: 54px; border-radius: 8px; }
+.shop-open { position: relative; }
+body.bg-starlit, .bg-swatch.bg-starlit { background: radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,.85), transparent 60%), radial-gradient(1px 1px at 68% 12%, rgba(255,255,255,.7), transparent 60%), radial-gradient(1.5px 1.5px at 82% 46%, rgba(255,255,255,.75), transparent 60%), radial-gradient(1px 1px at 28% 62%, rgba(255,255,255,.6), transparent 60%), radial-gradient(1.5px 1.5px at 52% 84%, rgba(255,255,255,.7), transparent 60%), radial-gradient(1px 1px at 92% 88%, rgba(255,255,255,.6), transparent 60%), radial-gradient(120% 70% at 50% 0%, rgba(40,60,140,.45), transparent 70%), var(--bg, #10131f); background-size: 140px 140px, 160px 160px, 180px 180px, 120px 120px, 200px 200px, 150px 150px, 100% 100%, 100% 100%; }
+body.bg-waves, .bg-swatch.bg-waves { background: repeating-radial-gradient(circle at 50% 120%, rgba(120,220,255,.10) 0 14px, transparent 14px 34px), linear-gradient(180deg, rgba(20,80,120,.25), rgba(0,0,0,0) 60%), var(--bg, #0e1a26); }
+body.bg-prism, .bg-swatch.bg-prism { background: conic-gradient(from 210deg at 50% 30%, rgba(255,80,160,.18), rgba(255,200,80,.14), rgba(80,255,200,.16), rgba(80,140,255,.18), rgba(255,80,160,.18)), var(--bg, #141022); }
+.bg-swatch.bg-none { background: var(--bg, #222); }

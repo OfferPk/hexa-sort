@@ -10,7 +10,7 @@
 
   // ---------------- persistence ----------------
   function defaults() {
-    return { level: 1, coins: 0, owned: ['basalt'], theme: 'basalt', settings: { sound: true, haptics: true, marks: false }, game: null, ad: {} };
+    return { level: 1, coins: 0, owned: ['basalt'], theme: 'basalt', bg: 'none', ownedBg: ['none'], trial: {}, settings: { sound: true, haptics: true, marks: false }, game: null, ad: {} };
   }
   function load() {
     var d = defaults();
@@ -40,7 +40,8 @@
   var hiddenSlots = {};   // tray slots hidden during the deal animation
   var trayAnim = null;    // {t0}
   var smashFx = null;
-  function theme() { for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === save.theme) return THEMES[i]; return THEMES[0]; }
+  var drawTheme = null; // set only while drawing a shop thumbnail
+  function theme() { var id = drawTheme || window.ShopCore.current(save, 'theme', 'theme'); for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i]; return THEMES[0]; }
 
   function validGame(g) {
     return g && Array.isArray(g.stacks) && Array.isArray(g.blocked) && Array.isArray(g.tray) && g.tray.length === 3 &&
@@ -74,7 +75,8 @@
   function applyTheme() {
     var cl = document.body.classList;
     Array.prototype.slice.call(cl).forEach(function (c) { if (/^theme-/.test(c)) cl.remove(c); });
-    cl.add('theme-' + save.theme);
+    cl.add('theme-' + theme().id);
+    window.ShopCore.applyBg(save);
     var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', theme().plate[1]);
     shadeCache = {};
     requestRender();
@@ -658,35 +660,23 @@
   // ---------------- shop ----------------
   function renderShop() {
     setCoins();
-    var grid = $('shop-grid'); grid.innerHTML = '';
-    THEMES.forEach(function (th) {
-      var owned = save.owned.indexOf(th.id) >= 0, sel = save.theme === th.id;
-      var d = document.createElement('div'); d.className = 'item theme-' + th.id + (sel ? ' selected' : '');
-      var prev = document.createElement('div'); prev.className = 'prev';
-      var pc = document.createElement('canvas'); prev.appendChild(pc); d.appendChild(prev);
-      drawPreview(pc, th);
-      var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = th.name; d.appendChild(nm);
-      var b = document.createElement('button'); b.className = 'buy';
-      if (sel) b.textContent = 'Equipped';
-      else if (owned) { b.textContent = 'Equip'; b.classList.add('can'); }
-      else { b.innerHTML = '<span class="coin-ico"></span>' + th.price; if (save.coins >= th.price) b.classList.add('can'); }
-      b.addEventListener('click', function () {
-        if (sel) return;
-        if (!owned) {
-          if (save.coins < th.price) { SFX.error(); toast('Complete more levels to earn ' + (th.price - save.coins) + ' more coins'); return; }
-          save.coins -= th.price; save.owned.push(th.id); SFX.coin();
-        } else SFX.click();
-        save.theme = th.id; persist(); applyTheme(); renderShop(); drawLogo();
-      });
-      d.appendChild(b);
-      grid.appendChild(d);
+    window.ShopCore.render({
+      grid: $('shop-grid'), save: save, persist: persist, apply: function () { applyTheme(); drawLogo(); setCoins(); }, toast: toast,
+      sfx: function (k) { if (k === 'coin') SFX.coin(); else if (k === 'error') SFX.error(); else SFX.click(); },
+      rewarded: function (ok, fail) { window.Ads.showRewarded(ok, fail); },
+      needMsg: function (n) { return 'Need ' + n + ' more coins. Claim your Daily reward or clear more levels.'; },
+      groups: [
+        { title: 'Hex palettes', kind: 'theme', field: 'theme', owned: save.owned, items: THEMES, itemClass: function (t) { return 'theme-' + t.id; },
+          thumb: function (th) { var pc = document.createElement('canvas'); drawPreview(pc, th); return pc; } },
+        { title: 'Backgrounds', kind: 'bg', field: 'bg', owned: save.ownedBg, items: window.ShopCore.BACKGROUNDS, thumb: window.ShopCore.bgThumb }
+      ]
     });
   }
   function drawPreview(pc, th) {
     var d = Math.min(3, window.devicePixelRatio || 1);
     pc.width = 120 * d; pc.height = 80 * d;
     var c = pc.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0);
-    var keep = save.theme; save.theme = th.id; shadeCache = {};
+    drawTheme = th.id; shadeCache = {};
     var s = 15, t = s * 0.24;
     var g = c.createLinearGradient(0, 0, 0, 80); g.addColorStop(0, th.plate[0]); g.addColorStop(1, th.plate[1]);
     c.fillStyle = g; c.beginPath(); c.roundRect ? c.roundRect(0, 0, 120, 80, 10) : c.rect(0, 0, 120, 80); c.fill();
@@ -697,7 +687,7 @@
         hexPath(c, x, y, s * 0.94); c.fillStyle = th.slot; c.fill();
         drawStack(c, x, y, s, t, cc[2], {});
       });
-    save.theme = keep; shadeCache = {};
+    drawTheme = null; shadeCache = {};
   }
   function syncSettingsUI() {
     $('set-sound').checked = !!save.settings.sound;
@@ -730,6 +720,9 @@
   $('btn-hammer').addEventListener('click', toggleHammer);
   $('btn-shuffle').addEventListener('click', shuffle);
   $('btn-shop').addEventListener('click', function () { SFX.unlock(); SFX.click(); renderShop(); $('shop').classList.remove('hidden'); });
+  $('btn-shop-card').addEventListener('click', function () { SFX.unlock(); SFX.click(); renderShop(); $('shop').classList.remove('hidden'); });
+  document.querySelector('[data-close="shop"]').addEventListener('click', function () { if (window.ShopCore.endPreview()) { applyTheme(); drawLogo(); } });
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') applyTheme(); });
   $('btn-settings-home').addEventListener('click', function () { SFX.unlock(); SFX.click(); syncSettingsUI(); $('settings').classList.remove('hidden'); });
   function syncMenuCard() {
     var b = $('btn-play');
